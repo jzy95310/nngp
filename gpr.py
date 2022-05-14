@@ -23,7 +23,7 @@ import time
 
 import tensorflow as tf
 
-flags = tf.app.flags
+flags = tf.compat.v1.flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_boolean("print_kernel", False, "Option to print out kernel")
@@ -112,21 +112,21 @@ class GaussianProcessRegression(object):
             tf.logging.info("Computed K_DD in %.3f secs" % (time.time() - start_time))
 
             while self.current_stability_eps < 1:
-            try:
-                start_time = time.time()
-                self.l_np, self.v_np = sess.run(
-                    [self.l, self.v],
-                    feed_dict={self.y_pl: self.output_y,
-                               self.k_data_data: self.k_np,
-                               self.stability_eps: self.current_stability_eps})
-                tf.logging.info(
-                      "Computed L_DD in %.3f secs"% (time.time() - start_time))
-                break
+                try:
+                    start_time = time.time()
+                    self.l_np, self.v_np = sess.run(
+                        [self.l, self.v],
+                        feed_dict={self.y_pl: self.output_y,
+                                self.k_data_data: self.k_np,
+                                self.stability_eps: self.current_stability_eps})
+                    tf.logging.info(
+                        "Computed L_DD in %.3f secs"% (time.time() - start_time))
+                    break
 
-            except tf.errors.InvalidArgumentError:
-                self.current_stability_eps *= 10
-                tf.logging.info("Cholesky decomposition failed, trying larger epsilon"
-                              ": {}".format(self.current_stability_eps))
+                except tf.errors.InvalidArgumentError:
+                    self.current_stability_eps *= 10
+                    tf.logging.info("Cholesky decomposition failed, trying larger epsilon"
+                                ": {}".format(self.current_stability_eps))
 
         if self.current_stability_eps > 0.2:
             raise ArithmeticError("Could not compute Cholesky decomposition.")

@@ -32,7 +32,7 @@ import tensorflow as tf
 
 import interp
 
-flags = tf.app.flags
+flags = tf.compat.v1.flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_boolean("use_precomputed_grid", True,
